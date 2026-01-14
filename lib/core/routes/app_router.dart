@@ -6,6 +6,7 @@ import 'package:quote_vault/features/auth/presentation/pages/signup_screen.dart'
 import 'package:quote_vault/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 import 'package:quote_vault/features/profile/presentation/pages/profile_screen.dart';
+import 'package:quote_vault/features/quotes/presentation/pages/home_screen.dart';
 
 class AppRouter {
   final AuthProvider authProvider;
@@ -25,8 +26,7 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: '/',
-                builder: (context, state) =>
-                    const Scaffold(body: Center(child: Text('Home Screen'))),
+                builder: (context, state) => const HomeScreen(),
               ),
             ],
           ),

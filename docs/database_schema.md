@@ -10,12 +10,16 @@ Extends the default Supabase auth user.
 - `updated_at` (timestamptz)
 
 ### 2. `quotes`
-Stores the curated list of quotes.
-- `id` (bigint/uuid, PK)
-- `content` (text, not null)
+Stores curated, static quote content imported from external datasets.
+- `id` (uuid, PK)
+- `text` (text, not null) - The quote content.
 - `author` (text, not null)
-- `category` (text, not null) - e.g., 'Motivation', 'Love', 'Success', 'Wisdom', 'Humor'
+- `category` (text, not null) - 'Motivation', 'Love', 'Success', 'Wisdom', 'Humor'.
+- `tags` (text[], nullable) - Array of tags.
+- `popularity` (double precision, nullable)
+- `source` (text, nullable)
 - `created_at` (timestamptz, default now())
+- **Constraint**: Unique combo of (text, author).
 
 ### 3. `favorites`
 Join table for users liking quotes.

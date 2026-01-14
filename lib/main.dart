@@ -9,6 +9,9 @@ import 'package:quote_vault/features/auth/presentation/providers/auth_provider.d
 import 'package:quote_vault/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:quote_vault/features/profile/domain/repositories/profile_repository.dart';
 import 'package:quote_vault/features/profile/presentation/providers/profile_provider.dart';
+import 'package:quote_vault/features/quotes/data/repositories/quote_repository_impl.dart';
+import 'package:quote_vault/features/quotes/domain/repositories/quote_repository.dart';
+import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -22,20 +25,27 @@ Future<void> main() async {
   final supabaseClient = Supabase.instance.client;
   final authRepository = AuthRepositoryImpl(supabaseClient);
   final profileRepository = ProfileRepositoryImpl(supabaseClient);
+  final quoteRepository = QuoteRepositoryImpl(supabaseClient);
 
   runApp(
-    MyApp(authRepository: authRepository, profileRepository: profileRepository),
+    MyApp(
+      authRepository: authRepository,
+      profileRepository: profileRepository,
+      quoteRepository: quoteRepository,
+    ),
   );
 }
 
 class MyApp extends StatelessWidget {
   final AuthRepository authRepository;
   final ProfileRepository profileRepository;
+  final QuoteRepository quoteRepository;
 
   const MyApp({
     super.key,
     required this.authRepository,
     required this.profileRepository,
+    required this.quoteRepository,
   });
 
   @override
@@ -48,6 +58,7 @@ class MyApp extends StatelessWidget {
           update: (_, auth, prev) =>
               ProfileProvider(profileRepository, auth.user?.id),
         ),
+        ChangeNotifierProvider(create: (_) => QuoteProvider(quoteRepository)),
       ],
       child: Builder(
         // Need Builder to get context with Provider for AppRouter if we want refreshListenable

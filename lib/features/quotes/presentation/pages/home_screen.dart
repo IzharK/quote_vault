@@ -1,0 +1,95 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
+import 'package:quote_vault/features/quotes/presentation/widgets/quote_card.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<QuoteProvider>().fetchQuotes();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      context.read<QuoteProvider>().fetchQuotes();
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    await context.read<QuoteProvider>().fetchQuotes(refresh: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('QuoteVault')),
+      body: Consumer<QuoteProvider>(
+        builder: (context, provider, child) {
+          if (provider.status == QuoteStatus.initial ||
+              (provider.status == QuoteStatus.loading &&
+                  provider.quotes.isEmpty)) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (provider.status == QuoteStatus.error && provider.quotes.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    provider.errorMessage ?? 'Something went wrong',
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _onRefresh,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: provider.quotes.length + (provider.hasMore ? 1 : 0),
+              padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
+              itemBuilder: (context, index) {
+                if (index == provider.quotes.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                return QuoteCard(quote: provider.quotes[index]);
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
