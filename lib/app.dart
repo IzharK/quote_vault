@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/di/injection_container.dart';
 import 'package:quote_vault/core/routes/app_router.dart';
@@ -34,6 +35,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp.router(
             title: 'QuoteVault',
             theme: AppTheme.lightTheme,
+            locale: DevicePreview.locale(context),
+            builder: DevicePreview.appBuilder,
             routerConfig: AppRouter(context.read<AuthProvider>()).router,
             debugShowCheckedModeBanner: false,
           );

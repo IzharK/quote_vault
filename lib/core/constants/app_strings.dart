@@ -24,4 +24,9 @@ class AppStrings {
   static const String changeAvatarButton = 'Change Avatar';
   static const String profileUpdated = 'Profile Name Updated';
   static const String avatarUpdated = 'Avatar Updated';
+
+  // Empty States
+  static const String noQuotesFound = 'No quotes found';
+  static const String noQuotesInCategory = 'No quotes in this category';
+  static const String typeToSearch = 'Type to search...';
 }

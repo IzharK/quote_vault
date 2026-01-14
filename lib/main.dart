@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:quote_vault/app.dart';
 import 'package:quote_vault/core/constants/supa_constants.dart';
@@ -14,5 +16,7 @@ Future<void> main() async {
 
   InjectionContainer.init();
 
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(enabled: !kReleaseMode, builder: (context) => const MyApp()),
+  );
 }

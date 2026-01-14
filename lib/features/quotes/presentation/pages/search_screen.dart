@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/constants/app_strings.dart';
+import 'package:quote_vault/core/widgets/empty_state_view.dart';
+import 'package:quote_vault/core/widgets/error_state_view.dart';
 import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
 import 'package:quote_vault/features/quotes/presentation/widgets/quote_card.dart';
 
@@ -79,7 +81,10 @@ class _SearchScreenState extends State<SearchScreen> {
           if (provider.searchStatus == QuoteStatus.initial &&
               provider.searchResults.isEmpty &&
               _searchController.text.isEmpty) {
-            return const Center(child: Text('Type to search...'));
+            return const EmptyStateView(
+              message: AppStrings.typeToSearch,
+              icon: Icons.search,
+            );
           }
 
           if (provider.searchStatus == QuoteStatus.loading &&
@@ -89,10 +94,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
           if (provider.searchStatus == QuoteStatus.error &&
               provider.searchResults.isEmpty) {
-            return Center(
-              child: Text(
-                provider.errorMessage ?? AppStrings.errorGeneric,
-                style: const TextStyle(color: Colors.red),
+            return ErrorStateView(
+              message: provider.errorMessage,
+              onRetry: () => context.read<QuoteProvider>().searchQuotes(
+                _searchController.text,
               ),
             );
           }
@@ -100,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> {
           if (provider.searchResults.isEmpty &&
               _searchController.text.isNotEmpty &&
               provider.searchStatus == QuoteStatus.loaded) {
-            return const Center(child: Text('No results found.'));
+            return const EmptyStateView(message: AppStrings.noQuotesFound);
           }
 
           return ListView.builder(

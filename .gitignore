@@ -13,6 +13,7 @@
 migrate_working_dir/
 .agent
 GEMINI.md
+ai_artifacts
 
 # IntelliJ related
 *.iml

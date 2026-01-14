@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    context.go(AppRouteNames.signup);
+                    context.push(AppRouteNames.signup);
                   },
                   child: const Text(AppStrings.noAccountLink),
                 ),

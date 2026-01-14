@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/constants/app_strings.dart';
+import 'package:quote_vault/core/widgets/empty_state_view.dart';
+import 'package:quote_vault/core/widgets/error_state_view.dart';
 import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
 import 'package:quote_vault/features/quotes/presentation/widgets/quote_card.dart';
 
@@ -53,23 +55,15 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           if (provider.status == QuoteStatus.error && provider.quotes.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    provider.errorMessage ?? AppStrings.errorGeneric,
-                    style: const TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _onRefresh,
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
-              ),
+            return ErrorStateView(
+              message: provider.errorMessage,
+              onRetry: _onRefresh,
             );
+          }
+
+          if (provider.status == QuoteStatus.loaded &&
+              provider.quotes.isEmpty) {
+            return const EmptyStateView(message: AppStrings.noQuotesFound);
           }
 
           return RefreshIndicator(

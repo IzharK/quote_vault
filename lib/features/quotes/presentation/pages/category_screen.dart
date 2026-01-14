@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/constants/app_strings.dart';
+import 'package:quote_vault/core/widgets/empty_state_view.dart';
+import 'package:quote_vault/core/widgets/error_state_view.dart';
 import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
 import 'package:quote_vault/features/quotes/presentation/widgets/quote_card.dart';
 
@@ -59,23 +61,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
           if (provider.categoryStatus == QuoteStatus.error &&
               provider.categoryQuotes.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    provider.errorMessage ?? AppStrings.errorGeneric,
-                    style: const TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _onRefresh,
-                    child: const Text(AppStrings.retry),
-                  ),
-                ],
-              ),
+            return ErrorStateView(
+              message: provider.errorMessage,
+              onRetry: _onRefresh,
             );
+          }
+
+          if (provider.categoryStatus == QuoteStatus.loaded &&
+              provider.categoryQuotes.isEmpty) {
+            return const EmptyStateView(message: AppStrings.noQuotesInCategory);
           }
 
           return RefreshIndicator(
