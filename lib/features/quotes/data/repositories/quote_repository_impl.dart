@@ -26,4 +26,45 @@ class QuoteRepositoryImpl implements QuoteRepository {
     final List<dynamic> jsonList = data;
     return jsonList.map((json) => QuoteModel.fromJson(json)).toList();
   }
+
+  @override
+  Future<List<Quote>> getQuotesByCategory({
+    required String category,
+    required int page,
+    required int pageSize,
+  }) async {
+    final from = page * pageSize;
+    final to = from + pageSize - 1;
+
+    final data = await _supabaseClient
+        .from(SupaConstants.quotesTable)
+        .select()
+        .eq('category', category)
+        .order('created_at', ascending: false)
+        .range(from, to);
+
+    final List<dynamic> jsonList = data;
+    return jsonList.map((json) => QuoteModel.fromJson(json)).toList();
+  }
+
+  @override
+  Future<List<Quote>> searchQuotes({
+    required String query,
+    required int page,
+    required int pageSize,
+  }) async {
+    final from = page * pageSize;
+    final to = from + pageSize - 1;
+
+    // Searching text column using Full Text Search and author column using ILIKE
+    final data = await _supabaseClient
+        .from(SupaConstants.quotesTable)
+        .select()
+        .or('text.fts.$query,author.ilike.%$query%')
+        .order('created_at', ascending: false)
+        .range(from, to);
+
+    final List<dynamic> jsonList = data;
+    return jsonList.map((json) => QuoteModel.fromJson(json)).toList();
+  }
 }

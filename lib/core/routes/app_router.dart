@@ -7,7 +7,9 @@ import 'package:quote_vault/features/auth/presentation/pages/login_screen.dart';
 import 'package:quote_vault/features/auth/presentation/pages/signup_screen.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 import 'package:quote_vault/features/profile/presentation/pages/profile_screen.dart';
+import 'package:quote_vault/features/quotes/presentation/pages/category_screen.dart';
 import 'package:quote_vault/features/quotes/presentation/pages/home_screen.dart';
+import 'package:quote_vault/features/quotes/presentation/pages/search_screen.dart';
 
 class AppRouter {
   final AuthProvider authProvider;
@@ -29,6 +31,15 @@ class AppRouter {
                 path: AppRouteNames.home,
                 name: 'home',
                 builder: (context, state) => const HomeScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'category/:categoryId',
+                    name: 'category',
+                    builder: (context, state) => CategoryScreen(
+                      categoryId: state.pathParameters['categoryId']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -37,9 +48,7 @@ class AppRouter {
               GoRoute(
                 path: AppRouteNames.search,
                 name: 'search',
-                builder: (context, state) => const Scaffold(
-                  body: Center(child: Text('Search Screen Placeholder')),
-                ),
+                builder: (context, state) => const SearchScreen(),
               ),
             ],
           ),

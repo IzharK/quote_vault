@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quote_vault/features/quotes/domain/entities/quote.dart';
 
 class QuoteCard extends StatelessWidget {
@@ -18,22 +19,30 @@ class QuoteCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Category Chip
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12.0,
-                vertical: 6.0,
-              ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Text(
-                quote.category.toUpperCase(),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10.0,
-                  letterSpacing: 1.0,
+            GestureDetector(
+              onTap: () {
+                context.pushNamed(
+                  'category',
+                  pathParameters: {'categoryId': quote.category},
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 6.0,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Text(
+                  quote.category.toUpperCase(),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10.0,
+                    letterSpacing: 1.0,
+                  ),
                 ),
               ),
             ),
