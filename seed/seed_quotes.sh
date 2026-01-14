@@ -76,7 +76,7 @@ count=0
 for ((page=1; page<=MAX_PAGES; page++)); do
   echo "📄 Fetching page $page"
 
-  response=$(curl -s \
+  response=$(curl -s -k \
     -H "User-Agent: quote-vault-seeder/1.0" \
     "https://api.quotable.io/quotes?limit=$PAGE_LIMIT&page=$page")
 
