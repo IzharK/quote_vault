@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:quote_vault/core/constants/app_strings.dart';
+import 'package:quote_vault/core/routes/route_names.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -40,7 +42,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final isLoading = authProvider.status == AuthStatus.loading;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign Up')),
+      appBar: AppBar(title: const Text(AppStrings.signupTitle)),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -115,14 +117,14 @@ class _SignupScreenState extends State<SignupScreen> {
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
                         ),
-                        child: const Text('Sign Up'),
+                        child: const Text(AppStrings.signupTitle),
                       ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    context.go('/login');
+                    context.go(AppRouteNames.login);
                   },
-                  child: const Text('Already have an account? Login'),
+                  child: const Text(AppStrings.haveAccountLink),
                 ),
               ],
             ),

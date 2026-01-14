@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quote_vault/core/constants/app_strings.dart';
 import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
 import 'package:quote_vault/features/quotes/presentation/widgets/quote_card.dart';
 
@@ -42,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('QuoteVault')),
+      appBar: AppBar(title: const Text(AppStrings.homeTitle)),
       body: Consumer<QuoteProvider>(
         builder: (context, provider, child) {
           if (provider.status == QuoteStatus.initial ||
@@ -57,14 +58,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    provider.errorMessage ?? 'Something went wrong',
+                    provider.errorMessage ?? AppStrings.errorGeneric,
                     style: const TextStyle(color: Colors.red),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _onRefresh,
-                    child: const Text('Retry'),
+                    child: const Text(AppStrings.retry),
                   ),
                 ],
               ),

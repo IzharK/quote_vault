@@ -40,11 +40,7 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> updateName(String fullName) async {
     if (_profile == null) return;
 
-    final updatedProfile = Profile(
-      id: _profile!.id,
-      fullName: fullName,
-      avatarUrl: _profile!.avatarUrl,
-    );
+    final updatedProfile = _profile!.copyWith(fullName: fullName);
     await _updateProfile(updatedProfile);
   }
 
@@ -61,11 +57,7 @@ class ProfileProvider extends ChangeNotifier {
         userId,
         imageFile,
       );
-      final updatedProfile = Profile(
-        id: profile.id,
-        fullName: profile.fullName,
-        avatarUrl: avatarUrl,
-      );
+      final updatedProfile = profile.copyWith(avatarUrl: avatarUrl);
       await _profileRepository.updateProfile(updatedProfile);
       _profile = updatedProfile;
       _status = ProfileStatus.loaded;

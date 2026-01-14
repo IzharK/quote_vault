@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:quote_vault/core/constants/app_strings.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -27,9 +28,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       if (mounted && authProvider.status != AuthStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password reset link sent to your email.'),
-          ),
+          SnackBar(content: Text(AppStrings.passwordResetLinkSent)),
         );
         context.pop(); // Return to Login
       }
@@ -42,7 +41,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final isLoading = authProvider.status == AuthStatus.loading;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Reset Password')),
+      appBar: AppBar(title: const Text(AppStrings.resetPasswordTitle)),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -59,8 +58,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       style: const TextStyle(color: Colors.red),
                     ),
                   ),
-                const Text(
-                  'Enter your email address and we will send you a link to reset your password.',
+                Text(
+                  AppStrings.resetPasswordTitle,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),

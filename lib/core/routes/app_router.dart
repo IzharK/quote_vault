@@ -1,9 +1,10 @@
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:quote_vault/core/routes/route_names.dart';
 import 'package:quote_vault/core/widgets/scaffold_with_nav_bar.dart';
+import 'package:quote_vault/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:quote_vault/features/auth/presentation/pages/login_screen.dart';
 import 'package:quote_vault/features/auth/presentation/pages/signup_screen.dart';
-import 'package:quote_vault/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 import 'package:quote_vault/features/profile/presentation/pages/profile_screen.dart';
 import 'package:quote_vault/features/quotes/presentation/pages/home_screen.dart';
@@ -14,7 +15,7 @@ class AppRouter {
   AppRouter(this.authProvider);
 
   late final router = GoRouter(
-    initialLocation: '/',
+    initialLocation: AppRouteNames.home,
     refreshListenable: authProvider,
     routes: [
       StatefulShellRoute.indexedStack(
@@ -25,7 +26,8 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/',
+                path: AppRouteNames.home,
+                name: 'home',
                 builder: (context, state) => const HomeScreen(),
               ),
             ],
@@ -33,7 +35,8 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/search',
+                path: AppRouteNames.search,
+                name: 'search',
                 builder: (context, state) => const Scaffold(
                   body: Center(child: Text('Search Screen Placeholder')),
                 ),
@@ -43,7 +46,8 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/collections',
+                path: AppRouteNames.collections,
+                name: 'collections',
                 builder: (context, state) => const Scaffold(
                   body: Center(child: Text('Collections Screen Placeholder')),
                 ),
@@ -53,35 +57,46 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/profile',
+                path: AppRouteNames.profile,
+                name: 'profile',
                 builder: (context, state) => const ProfileScreen(),
               ),
             ],
           ),
         ],
       ),
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
-        path: '/signup',
+        path: AppRouteNames.login,
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRouteNames.signup,
+        name: 'signup',
         builder: (context, state) => const SignupScreen(),
       ),
       GoRoute(
-        path: '/forgot-password',
+        path: AppRouteNames.forgotPassword,
+        name: 'forgotPassword',
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
     ],
     redirect: (context, state) {
       final isLoggedIn = authProvider.status == AuthStatus.authenticated;
-      final isLoggingIn = state.uri.toString() == '/login';
-      final isSigningUp = state.uri.toString() == '/signup';
-      final isResettingPassword = state.uri.toString() == '/forgot-password';
+      final currentLoc = state.uri.toString();
 
-      if (!isLoggedIn && !isLoggingIn && !isSigningUp && !isResettingPassword) {
-        return '/login';
+      final isLoggingIn = currentLoc == AppRouteNames.login;
+      final isSigningUp = currentLoc == AppRouteNames.signup;
+      final isResettingPassword = currentLoc == AppRouteNames.forgotPassword;
+
+      final isAuthPage = isLoggingIn || isSigningUp || isResettingPassword;
+
+      if (!isLoggedIn && !isAuthPage) {
+        return AppRouteNames.login;
       }
 
-      if (isLoggedIn && (isLoggingIn || isSigningUp || isResettingPassword)) {
-        return '/';
+      if (isLoggedIn && isAuthPage) {
+        return AppRouteNames.home;
       }
 
       return null;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:quote_vault/core/constants/app_strings.dart';
+import 'package:quote_vault/core/routes/route_names.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -38,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final isLoading = authProvider.status == AuthStatus.loading;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text(AppStrings.loginTitle)),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -97,15 +99,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    context.go('/signup');
+                    context.go(AppRouteNames.signup);
                   },
-                  child: const Text('Don\'t have an account? Sign up'),
+                  child: const Text(AppStrings.noAccountLink),
                 ),
                 TextButton(
                   onPressed: () {
-                    context.push('/forgot-password');
+                    context.push(AppRouteNames.forgotPassword);
                   },
-                  child: const Text('Forgot Password?'),
+                  child: const Text(AppStrings.forgotPasswordLink),
                 ),
               ],
             ),

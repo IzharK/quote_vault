@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:quote_vault/features/profile/data/models/profile_model.dart';
 import 'package:quote_vault/features/profile/domain/entities/profile.dart';
 import 'package:quote_vault/features/profile/domain/repositories/profile_repository.dart';
+import 'package:quote_vault/core/constants/supa_constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -13,7 +14,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<Profile> getProfile(String userId) async {
     try {
       final data = await _supabaseClient
-          .from('profiles')
+          .from(SupaConstants.profilesTable)
           .select()
           .eq('id', userId)
           .single();
@@ -28,7 +29,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<void> updateProfile(Profile profile) async {
     final model = ProfileModel.fromEntity(profile);
-    await _supabaseClient.from('profiles').upsert(model.toJson());
+    await _supabaseClient
+        .from(SupaConstants.profilesTable)
+        .upsert(model.toJson());
   }
 
   @override
@@ -38,7 +41,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     final filePath = fileName; // Path inside the bucket
 
     await _supabaseClient.storage
-        .from('avatars')
+        .from(SupaConstants.avatarsBucket)
         .upload(
           filePath,
           imageFile,
@@ -46,7 +49,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
         );
 
     final imageUrl = _supabaseClient.storage
-        .from('avatars')
+        .from(SupaConstants.avatarsBucket)
         .getPublicUrl(filePath);
     return imageUrl;
   }

@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:quote_vault/core/constants/app_strings.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 import 'package:quote_vault/features/profile/presentation/providers/profile_provider.dart';
+import 'package:quote_vault/features/profile/presentation/widgets/profile_avatar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -37,9 +39,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _nameController.text.trim(),
       );
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Profile Name Updated')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.profileUpdated)),
+        );
       }
     }
   }
@@ -50,9 +52,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         await context.read<ProfileProvider>().updateAvatar(File(image.path));
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Avatar Updated')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(AppStrings.avatarUpdated)),
+          );
         }
       }
     }
@@ -75,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(title: const Text(AppStrings.profileTitle)),
       body:
           isLoading &&
               profile ==
@@ -93,41 +95,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: const TextStyle(color: Colors.red),
                       ),
                     ),
-                  GestureDetector(
+                  ProfileAvatar(
+                    avatarUrl: profile?.avatarUrl,
                     onTap: _pickImage,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: profile?.avatarUrl != null
-                          ? NetworkImage(profile!.avatarUrl!)
-                          : null,
-                      child: profile?.avatarUrl == null
-                          ? const Icon(Icons.person, size: 50)
-                          : null,
-                    ),
                   ),
                   const SizedBox(height: 8),
                   TextButton(
                     onPressed: _pickImage,
-                    child: const Text('Change Avatar'),
+                    child: const Text(AppStrings.changeAvatarButton),
                   ),
                   const SizedBox(height: 24),
                   TextField(
                     controller: _nameController,
                     decoration: const InputDecoration(
-                      labelText: 'Full Name',
+                      labelText: AppStrings.fullNameLabel,
                       border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: isLoading ? null : _updateName,
-                    child: const Text('Update Name'),
+                    child: const Text(AppStrings.updateNameButton),
                   ),
                   const SizedBox(height: 48),
                   OutlinedButton.icon(
                     onPressed: _signOut,
                     icon: const Icon(Icons.logout),
-                    label: const Text('Sign Out'),
+                    label: const Text(AppStrings.signOutButton),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                     ),

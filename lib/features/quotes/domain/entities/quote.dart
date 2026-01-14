@@ -19,6 +19,26 @@ class Quote extends Equatable {
     this.source,
   });
 
+  Quote copyWith({
+    String? id,
+    String? text,
+    String? author,
+    String? category,
+    List<String>? tags,
+    double? popularity,
+    String? source,
+  }) {
+    return Quote(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      author: author ?? this.author,
+      category: category ?? this.category,
+      tags: tags ?? this.tags,
+      popularity: popularity ?? this.popularity,
+      source: source ?? this.source,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,
