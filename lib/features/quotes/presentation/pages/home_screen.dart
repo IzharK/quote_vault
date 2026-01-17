@@ -4,6 +4,7 @@ import 'package:quote_vault/core/constants/app_strings.dart';
 import 'package:quote_vault/core/widgets/empty_state_view.dart';
 import 'package:quote_vault/core/widgets/error_state_view.dart';
 import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
+import 'package:quote_vault/features/quotes/presentation/widgets/qod_widget.dart';
 import 'package:quote_vault/features/quotes/presentation/widgets/quote_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,7 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<QuoteProvider>().fetchQuotes();
+      context.read<QuoteProvider>()
+        ..fetchQuotes()
+        ..loadQuoteOfTheDay();
     });
   }
 
@@ -68,19 +71,39 @@ class _HomeScreenState extends State<HomeScreen> {
 
           return RefreshIndicator(
             onRefresh: _onRefresh,
-            child: ListView.builder(
+            child: CustomScrollView(
               controller: _scrollController,
-              itemCount: provider.quotes.length + (provider.hasMore ? 1 : 0),
-              padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
-              itemBuilder: (context, index) {
-                if (index == provider.quotes.length) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                return QuoteCard(quote: provider.quotes[index]);
-              },
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Consumer<QuoteProvider>(
+                    builder: (context, provider, child) {
+                      return QODWidget(
+                        quote: provider.quoteOfTheDay,
+                        isLoading: provider.isQodLoading,
+                        onRetry: () => provider.loadQuoteOfTheDay(),
+                      );
+                    },
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (index == provider.quotes.length) {
+                          return const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+                        return QuoteCard(quote: provider.quotes[index]);
+                      },
+                      childCount:
+                          provider.quotes.length + (provider.hasMore ? 1 : 0),
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         },

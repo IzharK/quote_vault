@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:quote_vault/app.dart';
 import 'package:quote_vault/core/constants/supa_constants.dart';
 import 'package:quote_vault/core/di/injection_container.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +12,7 @@ Future<void> main() async {
   await Supabase.initialize(
     url: SupaConstants.supabaseUrl,
     anonKey: SupaConstants.supabaseAnonKey,
+    debug: !kReleaseMode,
   );
 
   InjectionContainer.init();

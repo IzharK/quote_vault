@@ -1,9 +1,9 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:quote_vault/core/routes/route_names.dart';
 import 'package:quote_vault/core/theme/app_colors.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 
@@ -46,9 +46,9 @@ class _SignupScreenState extends State<SignupScreen> {
       await authProvider.signUp(
         _emailController.text.trim(),
         _passwordController.text.trim(),
-        // Pass name if supported by AuthProvider, currently only email/pass in signUp method signature
-        // We might need to update AuthProvider to accept name, or update profile after signup.
-        // For now, just email/pass.
+        name: _nameController.text.trim().isNotEmpty
+            ? _nameController.text.trim()
+            : null,
       );
 
       // If name is entered, we should ideally update the profile.
@@ -60,6 +60,9 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final isLoading = authProvider.status == AuthStatus.loading;
+
+    // Listen for errors (one-off) - ideally use a mixin or separate listener,
+    // but here we can just show the error widget conditionally.
 
     // gradients
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -264,16 +267,37 @@ class _SignupScreenState extends State<SignupScreen> {
                                           child: const Text('Create Account'),
                                         ),
                                 ),
-                                if (authProvider.errorMessage != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 16.0),
-                                    child: Text(
-                                      authProvider.errorMessage!,
-                                      style: const TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 14,
+                                if (authProvider.status == AuthStatus.error &&
+                                    authProvider.errorMessage != null)
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 16.0),
+                                    padding: const EdgeInsets.all(12.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: Colors.red.withOpacity(0.5),
                                       ),
-                                      textAlign: TextAlign.center,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline,
+                                          color: Colors.red,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            authProvider.errorMessage!,
+                                            style: GoogleFonts.inter(
+                                              color: Colors.red[700],
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                               ],
@@ -286,86 +310,86 @@ class _SignupScreenState extends State<SignupScreen> {
                     const SizedBox(height: 40),
 
                     // Social Divider
-                    SizedBox(
-                      width: 480,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(child: Divider(color: AppColors.border)),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: Text(
-                                  'OR JOIN WITH',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textSecondary,
-                                    letterSpacing: 1.0,
-                                  ),
-                                ),
-                              ),
-                              Expanded(child: Divider(color: AppColors.border)),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
+                    // SizedBox(
+                    //   width: 480,
+                    //   child: Column(
+                    //     children: [
+                    //       Row(
+                    //         children: [
+                    //           Expanded(child: Divider(color: AppColors.border)),
+                    //           Padding(
+                    //             padding: const EdgeInsets.symmetric(
+                    //               horizontal: 16,
+                    //             ),
+                    //             child: Text(
+                    //               'OR JOIN WITH',
+                    //               style: GoogleFonts.inter(
+                    //                 fontSize: 12,
+                    //                 fontWeight: FontWeight.w500,
+                    //                 color: AppColors.textSecondary,
+                    //                 letterSpacing: 1.0,
+                    //               ),
+                    //             ),
+                    //           ),
+                    //           Expanded(child: Divider(color: AppColors.border)),
+                    //         ],
+                    //       ),
+                    //       const SizedBox(height: 24),
 
-                          // Social Buttons
-                          Row(
-                            spacing: 16,
-                            children: [
-                              Expanded(
-                                child: _socialButton(
-                                  'Google',
-                                  'assets/icons/google.png',
-                                  null,
-                                ),
-                              ), // Placeholder icon logic
-                              Expanded(
-                                child: _socialButton(
-                                  'Apple',
-                                  null,
-                                  Icons.apple,
-                                ),
-                              ),
-                            ],
-                          ),
+                    //       // Social Buttons
+                    //       Row(
+                    //         spacing: 16,
+                    //         children: [
+                    //           Expanded(
+                    //             child: _socialButton(
+                    //               'Google',
+                    //               'assets/icons/google.png',
+                    //               null,
+                    //             ),
+                    //           ), // Placeholder icon logic
+                    //           Expanded(
+                    //             child: _socialButton(
+                    //               'Apple',
+                    //               null,
+                    //               Icons.apple,
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
 
-                          const SizedBox(height: 48),
+                    //       const SizedBox(height: 48),
 
-                          // Footer
-                          Text(
-                            'Already have an account?',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 16,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => context.go(AppRouteNames.login),
-                            child: Text(
-                              'Log in',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            'By joining, you agree to our\nTerms of Service and Privacy Policy.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    //       // Footer
+                    //       Text(
+                    //         'Already have an account?',
+                    //         style: TextStyle(
+                    //           color: AppColors.textSecondary,
+                    //           fontSize: 16,
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: () => context.go(AppRouteNames.login),
+                    //         child: Text(
+                    //           'Log in',
+                    //           style: TextStyle(
+                    //             color: AppColors.primary,
+                    //             fontWeight: FontWeight.bold,
+                    //             fontSize: 16,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //       const SizedBox(height: 24),
+                    //       Text(
+                    //         'By joining, you agree to our\nTerms of Service and Privacy Policy.',
+                    //         textAlign: TextAlign.center,
+                    //         style: TextStyle(
+                    //           color: AppColors.textSecondary,
+                    //           fontSize: 12,
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -399,8 +423,8 @@ class _SignupScreenState extends State<SignupScreen> {
       prefixIcon: Icon(icon, color: AppColors.textSecondary),
       suffixIcon: suffixIcon,
       fillColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey.withOpacity(0.1)
-          : Colors.white.withOpacity(0.8),
+          ? Colors.grey.withValues(alpha: 0.1)
+          : Colors.white.withValues(alpha: 0.8),
     );
   }
 
@@ -416,7 +440,7 @@ class _SignupScreenState extends State<SignupScreen> {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 2,
             offset: const Offset(0, 1),
           ),

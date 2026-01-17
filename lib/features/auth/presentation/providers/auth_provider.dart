@@ -47,34 +47,54 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      print("Attempting to sign in: $email");
       await _authRepository.signInWithEmail(email, password);
+      print("Sign in successful call");
       // Status update handled by stream listener
     } catch (e) {
+      print("Sign in error: $e");
       _status = AuthStatus.error;
-      _errorMessage = e.toString();
-      notifyListeners();
-      // Revert to unauthenticated after error
-      _status = AuthStatus.unauthenticated;
+      _errorMessage = _parseError(e);
       notifyListeners();
     }
   }
 
-  Future<void> signUp(String email, String password) async {
+  Future<void> signUp(String email, String password, {String? name}) async {
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _authRepository.signUpWithEmail(email, password);
+      print("Attempting to sign up: $email");
+      final response = await _authRepository.signUpWithEmail(
+        email,
+        password,
+        name: name,
+      );
+      print("Sign up response user: ${response.user?.id}");
       // Status update handled by stream listener
+
+      // Safety/Manual update if stream is slow?
+      if (response.user != null && _user == null) {
+        // Stream *should* handle this, but if not, we wait.
+      }
     } catch (e) {
+      print("Sign up error: $e");
       _status = AuthStatus.error;
-      _errorMessage = e.toString();
+      _errorMessage = _parseError(e); // Helper to make cleaner errors
       notifyListeners();
-      // Revert to unauthenticated after error
-      _status = AuthStatus.unauthenticated;
-      notifyListeners();
+
+      // Do NOT immediately revert to unauthenticated, let the UI consume the error.
+      // But verify how UI consumes it. Usage of Consumer might re-build.
+      // If we don't revert, the spinner stops (status != loading).
     }
+  }
+
+  String _parseError(Object error) {
+    if (error is AuthException) {
+      return error.message;
+    }
+    return error.toString();
   }
 
   Future<void> signOut() async {

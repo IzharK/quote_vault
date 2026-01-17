@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/di/injection_container.dart';
 import 'package:quote_vault/core/routes/app_router.dart';
 import 'package:quote_vault/core/theme/app_theme.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
+import 'package:quote_vault/features/collections/presentation/providers/collection_provider.dart';
+import 'package:quote_vault/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:quote_vault/features/profile/presentation/providers/profile_provider.dart';
 import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
 
@@ -28,6 +30,24 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => QuoteProvider(InjectionContainer.quoteRepository),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, FavoritesProvider>(
+          create: (_) => FavoritesProvider(
+            InjectionContainer.favoriteRepository,
+            '', // Initial empty ID
+          ),
+          update: (_, auth, prev) => FavoritesProvider(
+            InjectionContainer.favoriteRepository,
+            auth.user?.id ?? '',
+          ),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, CollectionProvider>(
+          create: (_) =>
+              CollectionProvider(InjectionContainer.collectionRepository, ''),
+          update: (_, auth, prev) => CollectionProvider(
+            InjectionContainer.collectionRepository,
+            auth.user?.id ?? '',
+          ),
         ),
       ],
       child: Builder(

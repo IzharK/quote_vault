@@ -12,4 +12,5 @@ abstract class QuoteRepository {
     required int page,
     required int pageSize,
   });
+  Future<Quote> getRandomQuote();
 }

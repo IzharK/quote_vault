@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:quote_vault/features/collections/presentation/widgets/add_to_collection_sheet.dart';
+import 'package:quote_vault/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:quote_vault/features/quotes/domain/entities/quote.dart';
 
 class QuoteCard extends StatelessWidget {
@@ -77,9 +80,29 @@ class QuoteCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Consumer<FavoritesProvider>(
+                  builder: (context, provider, child) {
+                    final isFavorite = provider.isFavorite(quote.id);
+                    return IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : null,
+                      ),
+                      onPressed: () {
+                        provider.toggleFavorite(quote);
+                      },
+                    );
+                  },
+                ),
                 IconButton(
-                  icon: const Icon(Icons.favorite_border),
-                  onPressed: () {},
+                  icon: const Icon(Icons.playlist_add),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) =>
+                          AddToCollectionSheet(quoteId: quote.id),
+                    );
+                  },
                 ),
                 IconButton(icon: const Icon(Icons.share), onPressed: () {}),
               ],

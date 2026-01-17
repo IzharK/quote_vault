@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quote_vault/core/routes/route_names.dart';
 import 'package:quote_vault/core/widgets/scaffold_with_nav_bar.dart';
@@ -6,6 +5,9 @@ import 'package:quote_vault/features/auth/presentation/pages/forgot_password_scr
 import 'package:quote_vault/features/auth/presentation/pages/login_screen.dart';
 import 'package:quote_vault/features/auth/presentation/pages/signup_screen.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
+import 'package:quote_vault/features/collections/presentation/pages/collection_detail_screen.dart';
+import 'package:quote_vault/features/collections/presentation/pages/collections_screen.dart';
+import 'package:quote_vault/features/favorites/presentation/pages/favorites_screen.dart';
 import 'package:quote_vault/features/profile/presentation/pages/profile_screen.dart';
 import 'package:quote_vault/features/quotes/presentation/pages/category_screen.dart';
 import 'package:quote_vault/features/quotes/presentation/pages/home_screen.dart';
@@ -55,11 +57,9 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRouteNames.collections,
-                name: 'collections',
-                builder: (context, state) => const Scaffold(
-                  body: Center(child: Text('Collections Screen Placeholder')),
-                ),
+                path: AppRouteNames.favorites,
+                name: 'favorites',
+                builder: (context, state) => const FavoritesScreen(),
               ),
             ],
           ),
@@ -88,6 +88,19 @@ class AppRouter {
         path: AppRouteNames.forgotPassword,
         name: 'forgotPassword',
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: AppRouteNames.collections,
+        name: 'collections',
+        builder: (context, state) => const CollectionsScreen(),
+      ),
+      GoRoute(
+        path: '${AppRouteNames.collections}/:collectionId',
+        name: 'collection_detail',
+        builder: (context, state) => CollectionDetailScreen(
+          collectionId: state.pathParameters['collectionId']!,
+          collectionName: state.uri.queryParameters['name'] ?? 'Collection',
+        ),
       ),
     ],
     redirect: (context, state) {

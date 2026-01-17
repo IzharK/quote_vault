@@ -15,8 +15,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthResponse> signUpWithEmail(String email, String password) async {
-    return await _supabaseClient.auth.signUp(email: email, password: password);
+  Future<AuthResponse> signUpWithEmail(
+    String email,
+    String password, {
+    String? name,
+  }) async {
+    return await _supabaseClient.auth.signUp(
+      email: email,
+      password: password,
+      data: name != null ? {'full_name': name} : null,
+    );
   }
 
   @override
