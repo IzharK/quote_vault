@@ -6,6 +6,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      splashFactory: NoSplash.splashFactory,
       colorScheme: ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.textSecondary,

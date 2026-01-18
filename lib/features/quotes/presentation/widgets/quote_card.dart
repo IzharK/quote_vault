@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:quote_vault/core/services/share_service.dart';
-import 'package:quote_vault/features/collections/presentation/widgets/add_to_collection_sheet.dart';
+import 'package:quote_vault/core/widgets/share_options.dart';
 import 'package:quote_vault/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:quote_vault/features/quotes/domain/entities/quote.dart';
 
@@ -18,150 +17,132 @@ class QuoteCard extends StatefulWidget {
 class _QuoteCardState extends State<QuoteCard> {
   final GlobalKey _globalKey = GlobalKey();
 
-  void _showShareOptions() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.text_fields),
-              title: const Text('Share as Text'),
-              onTap: () {
-                Navigator.pop(context);
-                ShareService.shareText(
-                  quote: widget.quote.text,
-                  author: widget.quote.author,
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.image),
-              title: const Text('Share as Image'),
-              onTap: () async {
-                Navigator.pop(context);
-                try {
-                  await ShareService.shareWidgetImage(
-                    globalKey: _globalKey,
-                    quoteId: widget.quote.id,
-                  );
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to share image: $e')),
-                    );
-                  }
-                }
-              },
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF111218);
+    final subTextColor = isDark ? Colors.grey[400] : const Color(0xFF616889);
+
+    return RepaintBoundary(
+      key: _globalKey,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(24.0),
+          border: Border.all(
+            color: isDark ? Colors.white12 : Colors.white.withValues(alpha: .6),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: .08),
+              offset: const Offset(0, 10),
+              blurRadius: 40,
+              spreadRadius: -10,
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return RepaintBoundary(
-      key: _globalKey,
-      child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(28.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Category Chip
-              GestureDetector(
-                onTap: () {
-                  context.pushNamed(
-                    'category',
-                    pathParameters: {'categoryId': widget.quote.category},
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 6.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Text(
-                    widget.quote.category.toUpperCase(),
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10.0,
-                      letterSpacing: 1.0,
-                    ),
+              // Category
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.amber.withValues(alpha: .2)
+                      : const Color(0xFFFFFBEB),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  widget.quote.category.toUpperCase(),
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                    color: isDark ? Colors.amber[200] : const Color(0xFFB45309),
                   ),
                 ),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 20),
 
-              // Quote Text
+              // Quote
               Text(
                 '"${widget.quote.text}"',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontStyle: FontStyle.italic,
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 26,
+                  height: 1.3,
                   fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
+                  color: textColor,
                 ),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 24),
 
-              // Author
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    '- ${widget.quote.author}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16.0),
-
-              // Actions
+              // Bottom Row: Author + Actions
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Consumer<FavoritesProvider>(
-                    builder: (context, provider, child) {
-                      final isFavorite = provider.isFavorite(widget.quote.id);
-                      return IconButton(
-                        icon: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite ? Colors.red : null,
-                        ),
-                        onPressed: () {
-                          provider.toggleFavorite(widget.quote);
+                  // Author
+                  Expanded(
+                    child: Text(
+                      widget.quote.author.split(',').first,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+
+                  // Actions
+                  Row(
+                    children: [
+                      Consumer<FavoritesProvider>(
+                        builder: (context, provider, child) {
+                          final isFavorite = provider.isFavorite(
+                            widget.quote.id,
+                          );
+                          return IconButton(
+                            icon: Icon(
+                              isFavorite
+                                  ? Icons.bookmark
+                                  : Icons.bookmark_border,
+                              color: isFavorite ? Colors.red : subTextColor,
+                              size: 22,
+                            ),
+                            onPressed: () =>
+                                provider.toggleFavorite(widget.quote),
+                            splashRadius: 20,
+                            constraints: const BoxConstraints(),
+                            padding: EdgeInsets.zero,
+                          );
                         },
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.playlist_add),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) =>
-                            AddToCollectionSheet(quoteId: widget.quote.id),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: _showShareOptions,
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.ios_share,
+                          color: subTextColor,
+                          size: 22,
+                        ),
+                        onPressed: () => ShareOptions.showShareOptions(
+                          context,
+                          _globalKey,
+                          widget.quote,
+                        ),
+                        splashRadius: 20,
+                        constraints: const BoxConstraints(),
+                        padding: EdgeInsets.zero,
+                      ),
+                    ],
                   ),
                 ],
               ),

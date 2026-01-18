@@ -11,7 +11,7 @@ class ShareService {
   static Future<void> shareText({
     required String quote,
     required String author,
-    BuildContext? context, // For iPad popover info if needed
+    BuildContext? context,
   }) async {
     final text = '"$quote"\n\n- $author\n\nShared via QuoteVault';
     await SharePlus.instance.share(ShareParams(text: text));

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/widgets/background_gradient.dart';
+import 'package:quote_vault/core/widgets/share_options.dart';
 import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,6 +13,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey _globalKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -44,121 +47,132 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // 1. Background
-          const BackgroundGradient(),
+          // Shareable Content: Background + Quote
+          RepaintBoundary(
+            key: _globalKey,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // 1. Background
+                const BackgroundGradient(),
 
-          // 2. Main Content
-          if (isLoading)
-            const Center(child: CircularProgressIndicator())
-          else if (qod == null)
-            // Error / Empty State
-            Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.format_quote_rounded,
-                    size: 48,
-                    color: textColor.withValues(alpha: 0.5),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "No Quote Available",
-                    style: TextStyle(color: textColor.withValues(alpha: 0.7)),
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(onPressed: _onRefresh, child: const Text("Retry")),
-                ],
-              ),
-            )
-          else
-            Container(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.sizeOf(context).height,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // "Today's Wisdom" Label
-                  Text(
-                    "TODAY'S WISDOM",
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 3.2,
-                      color: textColor.withValues(alpha: 0.4),
+                // 2. Main Content
+                if (isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else if (qod == null)
+                  // Error / Empty State
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.format_quote_rounded,
+                          size: 48,
+                          color: textColor.withValues(alpha: 0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "No Quote Available",
+                          style: TextStyle(
+                            color: textColor.withValues(alpha: 0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: _onRefresh,
+                          child: const Text("Retry"),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 48),
-                  Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.topCenter,
-                    children: [
-                      // Giant Quote Icon
-                      Positioned(
-                        top: -50,
-                        left: -20,
-                        child: Icon(
-                          Icons.format_quote,
-                          size: 96,
-                          color: textColor.withValues(alpha: 0.05),
-                        ),
-                      ),
-
-                      // Quote Text
-                      Text(
-                        qod.text,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.playfairDisplay(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w500,
-                          color: textColor,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // Divider
+                  )
+                else
                   Container(
-                    height: 1,
-                    width: 40,
-                    color: textColor.withValues(alpha: 0.2),
-                  ),
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.sizeOf(context).height,
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // "Today's Wisdom" Label
+                        Text(
+                          "TODAY'S WISDOM",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 3.2,
+                            color: textColor.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        const SizedBox(height: 48),
+                        Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.topCenter,
+                          children: [
+                            // Giant Quote Icon
+                            Positioned(
+                              top: -50,
+                              left: -20,
+                              child: Icon(
+                                Icons.format_quote,
+                                size: 96,
+                                color: textColor.withValues(alpha: 0.05),
+                              ),
+                            ),
 
-                  const SizedBox(height: 16),
+                            // Quote Text
+                            Text(
+                              qod.text,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w500,
+                                color: textColor,
+                              ),
+                            ),
+                          ],
+                        ),
 
-                  // Author
-                  Text(
-                    '$qodAuthor\n$qodSection',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 20,
-                      fontStyle: FontStyle.italic,
-                      color: textColor.withValues(alpha: 0.7),
+                        const SizedBox(height: 40),
+
+                        // Divider
+                        Container(
+                          height: 1,
+                          width: 40,
+                          color: textColor.withValues(alpha: 0.2),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Author
+                        Text(
+                          '$qodAuthor\n$qodSection',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 20,
+                            fontStyle: FontStyle.italic,
+                            color: textColor.withValues(alpha: 0.7),
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // Tags (Pills)
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          alignment: WrapAlignment.center,
+                          children: [_buildTag(qod.category, textColor)],
+                        ),
+                      ],
                     ),
                   ),
-
-                  const SizedBox(height: 32),
-
-                  // Tags (Pills)
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      _buildTag(qod.category, textColor),
-                      // If we had more tags, we'd map them here
-                    ],
-                  ),
-                ],
-              ),
+              ],
             ),
+          ),
 
-          // 3. Top Right Actions
+          // 3. Top Right Actions (Not Captured)
           Positioned(
             top: MediaQuery.paddingOf(context).top + 16,
             right: 24,
@@ -172,9 +186,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(width: 16),
                 _buildActionButton(Icons.bookmark_outline, () {}),
                 const SizedBox(width: 16),
-                _buildActionButton(Icons.ios_share_rounded, () {}),
+                _buildActionButton(
+                  Icons.ios_share_rounded,
+                  () =>
+                      ShareOptions.showShareOptions(context, _globalKey, qod!),
+                ),
               ],
             ),
           ),

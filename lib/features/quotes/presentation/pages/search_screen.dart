@@ -93,10 +93,7 @@ class _SearchScreenState extends State<SearchScreen> {
       body: BackgroundGradient(
         child: Consumer<QuoteProvider>(
           builder: (context, provider, child) {
-            // Adjust padding for AppBar (kToolbarHeight + status bar + bottom widget height)
-            // A rough estimate or Safe Area + constant
-            final topPadding =
-                MediaQuery.of(context).padding.top + kToolbarHeight + 60;
+            final topPadding = MediaQuery.paddingOf(context).top;
 
             if (provider.searchStatus == QuoteStatus.initial &&
                 provider.searchResults.isEmpty &&
