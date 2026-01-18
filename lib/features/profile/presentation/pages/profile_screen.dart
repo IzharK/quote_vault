@@ -191,7 +191,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _SettingsItem(
                   icon: Icons.palette_outlined,
                   label: 'Appearance',
-                  trailing: 'Light',
+                  trailing: 'Customize',
+                  onTap: () => context.pushNamed('appearance'),
                 ),
                 _SettingsItem(
                   icon: Icons.language,

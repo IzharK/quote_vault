@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/di/injection_container.dart';
+import 'package:quote_vault/core/providers/theme_provider.dart';
 import 'package:quote_vault/core/routes/app_router.dart';
 import 'package:quote_vault/core/theme/app_theme.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
-import 'package:quote_vault/features/collections/presentation/providers/collection_provider.dart';
 import 'package:quote_vault/features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:quote_vault/features/profile/presentation/providers/profile_provider.dart';
 import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(
           create: (_) => AuthProvider(InjectionContainer.authRepository),
         ),
@@ -33,14 +34,6 @@ class MyApp extends StatelessWidget {
           ),
           update: (_, auth, prev) => FavoritesProvider(
             InjectionContainer.favoriteRepository,
-            auth.user?.id ?? '',
-          ),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, CollectionProvider>(
-          create: (_) =>
-              CollectionProvider(InjectionContainer.collectionRepository, ''),
-          update: (_, auth, prev) => CollectionProvider(
-            InjectionContainer.collectionRepository,
             auth.user?.id ?? '',
           ),
         ),
@@ -70,11 +63,16 @@ class _QuoteVaultAppState extends State<QuoteVaultApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch ThemeProvider to rebuild when color changes
+    final themeProvider = context.watch<ThemeProvider>();
+
     return MaterialApp.router(
-      title: 'QuoteVault',
-      theme: AppTheme.lightTheme,
-      routerConfig: _appRouter.router,
+      title: 'Quote Vault',
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme(themeProvider.primaryColor),
+      darkTheme: AppTheme.darkTheme(themeProvider.primaryColor),
+      themeMode: themeProvider.themeMode,
+      routerConfig: _appRouter.router,
     );
   }
 }

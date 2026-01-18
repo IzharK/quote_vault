@@ -34,12 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final isLoading = provider.isQodLoading;
 
     final qodAuthor = qod?.author.split(',').first;
-    final qodSection = qod?.author.split(',  ').last;
     // Font Styles from HTML/Design
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark
-        ? Colors.white
-        : const Color(0xFF2C2C2C); // Charcoal
+    final textColor = isDark ? Colors.white : const Color(0xFF2C2C2C);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -147,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         // Author
                         Text(
-                          '$qodAuthor\n$qodSection',
+                          qodAuthor ?? '',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.playfairDisplay(
                             fontSize: 20,

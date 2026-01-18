@@ -27,7 +27,7 @@ class _QuoteCardState extends State<QuoteCard> {
     return RepaintBoundary(
       key: _globalKey,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+        margin: const EdgeInsets.symmetric(horizontal: 12.0),
         decoration: BoxDecoration(
           color: cardBg,
           borderRadius: BorderRadius.circular(24.0),
@@ -56,9 +56,9 @@ class _QuoteCardState extends State<QuoteCard> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.amber.withValues(alpha: .2)
-                      : const Color(0xFFFFFBEB),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: isDark ? 0.2 : 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -67,7 +67,7 @@ class _QuoteCardState extends State<QuoteCard> {
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.0,
-                    color: isDark ? Colors.amber[200] : const Color(0xFFB45309),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),

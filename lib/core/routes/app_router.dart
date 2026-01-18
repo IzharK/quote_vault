@@ -5,8 +5,6 @@ import 'package:quote_vault/features/auth/presentation/pages/forgot_password_scr
 import 'package:quote_vault/features/auth/presentation/pages/login_screen.dart';
 import 'package:quote_vault/features/auth/presentation/pages/signup_screen.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
-import 'package:quote_vault/features/collections/presentation/pages/collection_detail_screen.dart';
-import 'package:quote_vault/features/collections/presentation/pages/collections_screen.dart';
 import 'package:quote_vault/features/favorites/presentation/pages/favorites_screen.dart';
 import 'package:quote_vault/features/profile/presentation/pages/notifications_screen.dart';
 import 'package:quote_vault/features/profile/presentation/pages/personal_information_screen.dart';
@@ -14,6 +12,7 @@ import 'package:quote_vault/features/profile/presentation/pages/profile_screen.d
 import 'package:quote_vault/features/quotes/presentation/pages/category_screen.dart';
 import 'package:quote_vault/features/quotes/presentation/pages/home_screen.dart';
 import 'package:quote_vault/features/quotes/presentation/pages/search_screen.dart';
+import 'package:quote_vault/features/settings/presentation/pages/appearance_screen.dart';
 
 class AppRouter {
   final AuthProvider authProvider;
@@ -83,6 +82,11 @@ class AppRouter {
                     name: 'notifications',
                     builder: (context, state) => const NotificationsScreen(),
                   ),
+                  GoRoute(
+                    path: 'appearance',
+                    name: 'appearance',
+                    builder: (context, state) => const AppearanceScreen(),
+                  ),
                 ],
               ),
             ],
@@ -103,19 +107,6 @@ class AppRouter {
         path: AppRouteNames.forgotPassword,
         name: 'forgotPassword',
         builder: (context, state) => const ForgotPasswordScreen(),
-      ),
-      GoRoute(
-        path: AppRouteNames.collections,
-        name: 'collections',
-        builder: (context, state) => const CollectionsScreen(),
-      ),
-      GoRoute(
-        path: '${AppRouteNames.collections}/:collectionId',
-        name: 'collection_detail',
-        builder: (context, state) => CollectionDetailScreen(
-          collectionId: state.pathParameters['collectionId']!,
-          collectionName: state.uri.queryParameters['name'] ?? 'Collection',
-        ),
       ),
     ],
     redirect: (context, state) {
