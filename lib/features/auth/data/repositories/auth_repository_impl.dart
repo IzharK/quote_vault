@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:quote_vault/core/constants/supa_constants.dart';
 import 'package:quote_vault/features/auth/domain/repositories/auth_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -8,10 +11,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthResponse> signInWithEmail(String email, String password) async {
-    return await _supabaseClient.auth.signInWithPassword(
+    final res = await _supabaseClient.auth.signInWithPassword(
       email: email,
       password: password,
     );
+    log('login response: ${res.user?.toJson()}');
+    return res;
   }
 
   @override
@@ -20,10 +25,32 @@ class AuthRepositoryImpl implements AuthRepository {
     String password, {
     String? name,
   }) async {
-    return await _supabaseClient.auth.signUp(
+    final response = await _supabaseClient.auth.signUp(
       email: email,
       password: password,
       data: name != null ? {'full_name': name} : null,
+    );
+
+    if (response.user != null) {
+      try {
+        await _supabaseClient.from(SupaConstants.profilesTable).upsert({
+          'id': response.user!.id,
+          'full_name': name,
+          'email': email,
+        });
+        log('Profile created successfully for user: ${response.user!.id}');
+      } catch (e) {
+        log('Error creating profile record: $e');
+      }
+    }
+
+    return response;
+  }
+
+  @override
+  Future<UserResponse> updatePassword(String newPassword) async {
+    return await _supabaseClient.auth.updateUser(
+      UserAttributes(password: newPassword),
     );
   }
 

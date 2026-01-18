@@ -101,6 +101,27 @@ class AuthProvider extends ChangeNotifier {
     await _authRepository.signOut();
   }
 
+  Future<void> updatePassword(String newPassword) async {
+    _status = AuthStatus.loading;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _authRepository.updatePassword(newPassword);
+      _status = AuthStatus.authenticated;
+      notifyListeners();
+    } catch (e) {
+      _status = AuthStatus.error;
+      _errorMessage = _parseError(e);
+      notifyListeners();
+      // Revert status so loading stops?
+      // Actually usually we want to stay authenticated if it fails, just show error.
+      _status = AuthStatus.authenticated;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   Future<void> resetPassword(String email) async {
     _status = AuthStatus.loading;
     _errorMessage = null;

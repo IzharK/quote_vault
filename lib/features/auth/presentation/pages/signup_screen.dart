@@ -1,10 +1,12 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/theme/app_colors.dart';
+import 'package:quote_vault/core/widgets/background_gradient.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -66,9 +68,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
     // gradients
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgGradient = isDark
-        ? AppColors.pastelGradientDark
-        : AppColors.pastelGradientLight;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -96,11 +95,16 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ),
         centerTitle: true,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        ),
       ),
       body: Stack(
         children: [
           // Background Gradient
-          Container(decoration: BoxDecoration(gradient: bgGradient)),
+          const Positioned.fill(child: BackgroundGradient()),
 
           // Scrollable Content
           SafeArea(
@@ -273,10 +277,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                     margin: const EdgeInsets.only(top: 16.0),
                                     padding: const EdgeInsets.all(12.0),
                                     decoration: BoxDecoration(
-                                      color: Colors.red.withOpacity(0.1),
+                                      color: Colors.red.withValues(alpha: .1),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
-                                        color: Colors.red.withOpacity(0.5),
+                                        color: Colors.red.withValues(alpha: .5),
                                       ),
                                     ),
                                     child: Row(
@@ -425,49 +429,6 @@ class _SignupScreenState extends State<SignupScreen> {
       fillColor: Theme.of(context).brightness == Brightness.dark
           ? Colors.grey.withValues(alpha: 0.1)
           : Colors.white.withValues(alpha: 0.8),
-    );
-  }
-
-  Widget _socialButton(String label, String? assetPath, IconData? iconData) {
-    // Simplified social button
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[800]
-            : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 2,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (iconData != null)
-                Icon(iconData, size: 20, color: AppColors.textPrimary),
-              if (iconData != null) const SizedBox(width: 8),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

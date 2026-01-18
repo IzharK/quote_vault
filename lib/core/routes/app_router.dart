@@ -8,6 +8,8 @@ import 'package:quote_vault/features/auth/presentation/providers/auth_provider.d
 import 'package:quote_vault/features/collections/presentation/pages/collection_detail_screen.dart';
 import 'package:quote_vault/features/collections/presentation/pages/collections_screen.dart';
 import 'package:quote_vault/features/favorites/presentation/pages/favorites_screen.dart';
+import 'package:quote_vault/features/profile/presentation/pages/notifications_screen.dart';
+import 'package:quote_vault/features/profile/presentation/pages/personal_information_screen.dart';
 import 'package:quote_vault/features/profile/presentation/pages/profile_screen.dart';
 import 'package:quote_vault/features/quotes/presentation/pages/category_screen.dart';
 import 'package:quote_vault/features/quotes/presentation/pages/home_screen.dart';
@@ -69,6 +71,19 @@ class AppRouter {
                 path: AppRouteNames.profile,
                 name: 'profile',
                 builder: (context, state) => const ProfileScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'personal-info',
+                    name: 'personal_info',
+                    builder: (context, state) =>
+                        const PersonalInformationScreen(),
+                  ),
+                  GoRoute(
+                    path: 'notifications',
+                    name: 'notifications',
+                    builder: (context, state) => const NotificationsScreen(),
+                  ),
+                ],
               ),
             ],
           ),

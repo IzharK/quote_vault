@@ -7,6 +7,7 @@ abstract class AuthRepository {
     String password, {
     String? name,
   });
+  Future<UserResponse> updatePassword(String newPassword);
   Future<void> signOut();
   Future<void> resetPasswordForEmail(String email);
   Session? getCurrentSession();

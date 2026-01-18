@@ -1,7 +1,10 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/constants/app_strings.dart';
+import 'package:quote_vault/core/widgets/background_gradient.dart';
 import 'package:quote_vault/core/widgets/empty_state_view.dart';
 import 'package:quote_vault/core/widgets/error_state_view.dart';
 import 'package:quote_vault/features/quotes/presentation/providers/quote_provider.dart';
@@ -50,8 +53,19 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('Search Quotes'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness:
+              Theme.of(context).brightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
@@ -76,55 +90,72 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
       ),
-      body: Consumer<QuoteProvider>(
-        builder: (context, provider, child) {
-          if (provider.searchStatus == QuoteStatus.initial &&
-              provider.searchResults.isEmpty &&
-              _searchController.text.isEmpty) {
-            return const EmptyStateView(
-              message: AppStrings.typeToSearch,
-              icon: Icons.search,
+      body: BackgroundGradient(
+        child: Consumer<QuoteProvider>(
+          builder: (context, provider, child) {
+            // Adjust padding for AppBar (kToolbarHeight + status bar + bottom widget height)
+            // A rough estimate or Safe Area + constant
+            final topPadding =
+                MediaQuery.of(context).padding.top + kToolbarHeight + 60;
+
+            if (provider.searchStatus == QuoteStatus.initial &&
+                provider.searchResults.isEmpty &&
+                _searchController.text.isEmpty) {
+              return Padding(
+                padding: EdgeInsets.only(top: topPadding),
+                child: const EmptyStateView(
+                  message: AppStrings.typeToSearch,
+                  icon: Icons.search,
+                ),
+              );
+            }
+
+            if (provider.searchStatus == QuoteStatus.loading &&
+                provider.searchResults.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (provider.searchStatus == QuoteStatus.error &&
+                provider.searchResults.isEmpty) {
+              return Padding(
+                padding: EdgeInsets.only(top: topPadding),
+                child: ErrorStateView(
+                  message: provider.errorMessage,
+                  onRetry: () => context.read<QuoteProvider>().searchQuotes(
+                    _searchController.text,
+                  ),
+                ),
+              );
+            }
+
+            if (provider.searchResults.isEmpty &&
+                _searchController.text.isNotEmpty &&
+                provider.searchStatus == QuoteStatus.loaded) {
+              return Padding(
+                padding: EdgeInsets.only(top: topPadding),
+                child: const EmptyStateView(message: AppStrings.noQuotesFound),
+              );
+            }
+
+            return ListView.builder(
+              controller: _scrollController,
+              itemCount:
+                  provider.searchResults.length +
+                  (provider.searchHasMore ? 1 : 0),
+              // Add top padding to avoid overlap with transparent AppBar
+              padding: EdgeInsets.only(top: topPadding + 8.0, bottom: 24.0),
+              itemBuilder: (context, index) {
+                if (index == provider.searchResults.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                return QuoteCard(quote: provider.searchResults[index]);
+              },
             );
-          }
-
-          if (provider.searchStatus == QuoteStatus.loading &&
-              provider.searchResults.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (provider.searchStatus == QuoteStatus.error &&
-              provider.searchResults.isEmpty) {
-            return ErrorStateView(
-              message: provider.errorMessage,
-              onRetry: () => context.read<QuoteProvider>().searchQuotes(
-                _searchController.text,
-              ),
-            );
-          }
-
-          if (provider.searchResults.isEmpty &&
-              _searchController.text.isNotEmpty &&
-              provider.searchStatus == QuoteStatus.loaded) {
-            return const EmptyStateView(message: AppStrings.noQuotesFound);
-          }
-
-          return ListView.builder(
-            controller: _scrollController,
-            itemCount:
-                provider.searchResults.length +
-                (provider.searchHasMore ? 1 : 0),
-            padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
-            itemBuilder: (context, index) {
-              if (index == provider.searchResults.length) {
-                return const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              return QuoteCard(quote: provider.searchResults[index]);
-            },
-          );
-        },
+          },
+        ),
       ),
     );
   }

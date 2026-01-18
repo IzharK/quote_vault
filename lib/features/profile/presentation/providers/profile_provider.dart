@@ -1,4 +1,6 @@
+import 'dart:developer';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:quote_vault/features/profile/domain/entities/profile.dart';
 import 'package:quote_vault/features/profile/domain/repositories/profile_repository.dart';
@@ -7,7 +9,7 @@ enum ProfileStatus { initial, loading, loaded, error }
 
 class ProfileProvider extends ChangeNotifier {
   final ProfileRepository _profileRepository;
-  final String? _userId;
+  String? _userId;
 
   ProfileStatus _status = ProfileStatus.initial;
   ProfileStatus get status => _status;
@@ -18,17 +20,26 @@ class ProfileProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  ProfileProvider(this._profileRepository, this._userId);
+  ProfileProvider(this._profileRepository, this._userId) {
+    if (_userId != null) {
+      loadProfile();
+    }
+  }
 
-  Future<void> loadProfile() async {
-    final userId = _userId;
-    if (userId == null) return;
+  Future<void> loadProfile({String? userId}) async {
+    if (userId != null) {
+      _userId = userId;
+    }
+
+    final id = _userId;
+    if (id == null) return;
 
     _status = ProfileStatus.loading;
     notifyListeners();
+    log('loading profile for user: $id');
 
     try {
-      _profile = await _profileRepository.getProfile(userId);
+      _profile = await _profileRepository.getProfile(id);
       _status = ProfileStatus.loaded;
     } catch (e) {
       _status = ProfileStatus.error;
@@ -38,7 +49,13 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   Future<void> updateName(String fullName) async {
-    if (_profile == null) return;
+    if (_profile == null) {
+      if (_userId != null) {
+        _profile = Profile(id: _userId!);
+      } else {
+        throw Exception("User ID not available. Please try logging in again.");
+      }
+    }
 
     final updatedProfile = _profile!.copyWith(fullName: fullName);
     await _updateProfile(updatedProfile);
@@ -46,8 +63,15 @@ class ProfileProvider extends ChangeNotifier {
 
   Future<void> updateAvatar(File imageFile) async {
     final userId = _userId;
+    // Handle profile being null by creating temporary one if userId exists
+    if (_profile == null && userId != null) {
+      _profile = Profile(id: userId);
+    }
+
     final profile = _profile;
-    if (profile == null || userId == null) return;
+    if (profile == null || userId == null) {
+      throw Exception("User ID not available.");
+    }
 
     _status = ProfileStatus.loading;
     notifyListeners();
@@ -61,11 +85,13 @@ class ProfileProvider extends ChangeNotifier {
       await _profileRepository.updateProfile(updatedProfile);
       _profile = updatedProfile;
       _status = ProfileStatus.loaded;
+      notifyListeners();
     } catch (e) {
       _status = ProfileStatus.error;
       _errorMessage = e.toString();
+      notifyListeners();
+      rethrow;
     }
-    notifyListeners();
   }
 
   Future<void> _updateProfile(Profile profile) async {
@@ -76,10 +102,12 @@ class ProfileProvider extends ChangeNotifier {
       await _profileRepository.updateProfile(profile);
       _profile = profile;
       _status = ProfileStatus.loaded;
+      notifyListeners();
     } catch (e) {
       _status = ProfileStatus.error;
       _errorMessage = e.toString();
+      notifyListeners();
+      rethrow;
     }
-    notifyListeners();
   }
 }

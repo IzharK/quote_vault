@@ -1,4 +1,3 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/di/injection_container.dart';
@@ -20,13 +19,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => AuthProvider(InjectionContainer.authRepository),
         ),
-        ChangeNotifierProxyProvider<AuthProvider, ProfileProvider>(
+        ChangeNotifierProvider(
           create: (_) =>
               ProfileProvider(InjectionContainer.profileRepository, null),
-          update: (_, auth, prev) => ProfileProvider(
-            InjectionContainer.profileRepository,
-            auth.user?.id,
-          ),
         ),
         ChangeNotifierProvider(
           create: (_) => QuoteProvider(InjectionContainer.quoteRepository),
@@ -50,18 +45,36 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ],
-      child: Builder(
-        builder: (context) {
-          return MaterialApp.router(
-            title: 'QuoteVault',
-            theme: AppTheme.lightTheme,
-            locale: DevicePreview.locale(context),
-            builder: DevicePreview.appBuilder,
-            routerConfig: AppRouter(context.read<AuthProvider>()).router,
-            debugShowCheckedModeBanner: false,
-          );
-        },
-      ),
+      child: const QuoteVaultApp(),
+    );
+  }
+}
+
+class QuoteVaultApp extends StatefulWidget {
+  const QuoteVaultApp({super.key});
+
+  @override
+  State<QuoteVaultApp> createState() => _QuoteVaultAppState();
+}
+
+class _QuoteVaultAppState extends State<QuoteVaultApp> {
+  late final AppRouter _appRouter;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize AppRouter once.
+    // It listens to AuthProvider internally via refreshListenable, so we don't need to recreate it.
+    _appRouter = AppRouter(context.read<AuthProvider>());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'QuoteVault',
+      theme: AppTheme.lightTheme,
+      routerConfig: _appRouter.router,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

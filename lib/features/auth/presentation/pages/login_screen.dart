@@ -1,11 +1,13 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:quote_vault/core/routes/route_names.dart';
 import 'package:quote_vault/core/theme/app_colors.dart';
+import 'package:quote_vault/core/widgets/background_gradient.dart';
 import 'package:quote_vault/features/auth/presentation/providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -43,30 +45,13 @@ class _LoginScreenState extends State<LoginScreen> {
     final authProvider = context.watch<AuthProvider>();
     final isLoading = authProvider.status == AuthStatus.loading;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgGradient = isDark
-        ? AppColors.pastelGradientDark
-        : AppColors.pastelGradientLight;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: GestureDetector(
-          onTap: () => context
-              .pop(), // Or maybe go home? Usually Login is popped if pushed, or navigation root.
-          // If this is the initial screen, pop might not work but GoRouter handles it.
-          // In the HTML it has a back arrow.
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            alignment: Alignment.center,
-            child: const Icon(
-              Icons.arrow_back_ios_new,
-              size: 20,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           'Log In',
           style: GoogleFonts.inter(
@@ -76,11 +61,16 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         centerTitle: true,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        ),
       ),
       body: Stack(
         children: [
           // Background
-          Container(decoration: BoxDecoration(gradient: bgGradient)),
+          const Positioned.fill(child: BackgroundGradient()),
 
           // Content
           SafeArea(
@@ -279,49 +269,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 480,
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Expanded(child: Divider(color: AppColors.border)),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: Text(
-                                  'OR CONTINUE WITH',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.textSecondary,
-                                    letterSpacing: 1.0,
-                                  ),
-                                ),
-                              ),
-                              Expanded(child: Divider(color: AppColors.border)),
-                            ],
-                          ),
-
-                          // const SizedBox(height: 24),
-
-                          // // Social Buttons
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment
-                          //       .center, // HTML uses flex gap-4
-                          //   children: [
-                          //     Expanded(
-                          //       child: _socialButton('Google', null, null),
-                          //     ),
-                          //     const SizedBox(width: 16),
-                          //     Expanded(
-                          //       child: _socialButton(
-                          //         'Apple',
-                          //         null,
-                          //         Icons.apple,
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
-                          const SizedBox(height: 48),
-
                           // Footer
                           Text(
                             "Don't have an account?",
@@ -380,48 +327,6 @@ class _LoginScreenState extends State<LoginScreen> {
       fillColor: Theme.of(context).brightness == Brightness.dark
           ? Colors.grey.withValues(alpha: 0.1)
           : Colors.white.withValues(alpha: 0.8),
-    );
-  }
-
-  Widget _socialButton(String label, String? assetPath, IconData? iconData) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[800]
-            : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 2,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (iconData != null)
-                Icon(iconData, size: 20, color: AppColors.textPrimary),
-              if (iconData != null) const SizedBox(width: 8),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

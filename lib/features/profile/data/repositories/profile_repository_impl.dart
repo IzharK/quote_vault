@@ -1,8 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
+
+import 'package:quote_vault/core/constants/supa_constants.dart';
 import 'package:quote_vault/features/profile/data/models/profile_model.dart';
 import 'package:quote_vault/features/profile/domain/entities/profile.dart';
 import 'package:quote_vault/features/profile/domain/repositories/profile_repository.dart';
-import 'package:quote_vault/core/constants/supa_constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -18,10 +20,34 @@ class ProfileRepositoryImpl implements ProfileRepository {
           .select()
           .eq('id', userId)
           .single();
+      log('profile data: $data');
       return ProfileModel.fromJson(data);
     } catch (e) {
-      // If profile doesn't exist, return empty profile with just ID
-      // This handles the case where trigger failed or user wasn't created in profiles table properly
+      log('profile not found in DB: $e. Falling back to Auth Metadata.');
+
+      // Fallback: Check Auth User Metadata
+      final user = _supabaseClient.auth.currentUser;
+      if (user != null && user.id == userId) {
+        String? fullName = user.userMetadata?['full_name'] as String?;
+        if (fullName == null || fullName.isEmpty) {
+          fullName = user.email?.split('@').first;
+        }
+        log('Found user in Auth Metadata: $fullName');
+
+        final fallbackProfile = Profile(id: userId, fullName: fullName);
+
+        // Auto-Sync: Create the missing row in 'profiles' table
+        // This effectively "self-heals" the missing data issue.
+        try {
+          await updateProfile(fallbackProfile);
+          log('Successfully synced Auth user to profiles table.');
+        } catch (syncError) {
+          log('Failed to sync user to profiles table: $syncError');
+        }
+
+        return fallbackProfile;
+      }
+
       return Profile(id: userId);
     }
   }
