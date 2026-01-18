@@ -98,6 +98,73 @@ class AppearanceScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   Text(
+                    "TEXT SIZE",
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.black26 : Colors.white54,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'A',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'A',
+                              style: GoogleFonts.inter(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Slider(
+                          value: themeProvider.textScaleFactor,
+                          min: 0.8,
+                          max: 1.4,
+                          divisions: 6,
+                          label:
+                              "${(themeProvider.textScaleFactor * 100).round()}%",
+                          onChanged: (value) =>
+                              themeProvider.setTextScale(value),
+                          activeColor: themeProvider.primaryColor,
+                          inactiveColor: isDark
+                              ? Colors.grey[800]
+                              : Colors.grey[300],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "The quick brown fox jumps over the lazy dog.",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: isDark ? Colors.grey[300] : Colors.grey[800],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
                     "ACCENT COLOR",
                     style: GoogleFonts.inter(
                       fontSize: 12,

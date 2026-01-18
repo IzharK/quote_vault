@@ -4,14 +4,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ThemeProvider extends ChangeNotifier {
   static const String _colorKey = 'theme_color';
   static const String _modeKey = 'theme_mode';
+  static const String _scaleKey = 'text_scale';
   late SharedPreferences _prefs;
 
-  // Default primary color
+  // Default values
   Color _primaryColor = const Color(0xFF2B4BEE);
   ThemeMode _themeMode = ThemeMode.system;
+  double _textScaleFactor = 1.0;
 
   Color get primaryColor => _primaryColor;
   ThemeMode get themeMode => _themeMode;
+  double get textScaleFactor => _textScaleFactor;
 
   ThemeProvider() {
     _loadFromPrefs();
@@ -38,6 +41,12 @@ class ThemeProvider extends ChangeNotifier {
       }
     }
 
+    // Load Text Scale
+    final scale = _prefs.getDouble(_scaleKey);
+    if (scale != null) {
+      _textScaleFactor = scale;
+    }
+
     notifyListeners();
   }
 
@@ -54,5 +63,11 @@ class ThemeProvider extends ChangeNotifier {
     if (mode == ThemeMode.light) modeStr = 'light';
     if (mode == ThemeMode.dark) modeStr = 'dark';
     await _prefs.setString(_modeKey, modeStr);
+  }
+
+  Future<void> setTextScale(double scale) async {
+    _textScaleFactor = scale;
+    notifyListeners();
+    await _prefs.setDouble(_scaleKey, scale);
   }
 }

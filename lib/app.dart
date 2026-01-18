@@ -67,6 +67,14 @@ class _QuoteVaultAppState extends State<QuoteVaultApp> {
     final themeProvider = context.watch<ThemeProvider>();
 
     return MaterialApp.router(
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(themeProvider.textScaleFactor),
+          ),
+          child: child!,
+        );
+      },
       title: 'Quote Vault',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme(themeProvider.primaryColor),
